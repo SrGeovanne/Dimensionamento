@@ -1,23 +1,13 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "ceuma";
-
-// Conexão ao MySQL
-$conn = new mysqli($servername, $username, $password);
-
-// Verifica conexão
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include 'conexao.php'; // Inclui o arquivo de conexão
 
 // Nome do banco de dados fornecido pelo usuário
 $dbname = $_POST['nome_projeto'];
 
 // Criação do banco de dados se não existir
-$sql = "CREATE DATABASE IF NOT EXISTS $dbname";
+$sql_create_db = "CREATE DATABASE IF NOT EXISTS $dbname";
 
-if ($conn->query($sql) === TRUE) {
+if ($conn->query($sql_create_db) === TRUE) {
     echo "Banco de dados '$dbname' criado com sucesso ou já existe.<br>";
 } else {
     echo "Erro ao criar banco de dados: " . $conn->error . "<br>";
@@ -27,13 +17,18 @@ if ($conn->query($sql) === TRUE) {
 $conn->select_db($dbname);
 
 // Criação da tabela de projetos
-$sql = "CREATE TABLE IF NOT EXISTS projetos (
+$sql_create_table = "CREATE TABLE IF NOT EXISTS projeto (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome_projeto VARCHAR(255) NOT NULL,
-    ramo VARCHAR(255) NOT NULL
+    ramo VARCHAR(255) NOT NULL,
+    Grupo VARCHAR(255),
+    Carga VARCHAR(255),
+    Descricoes VARCHAR(255),
+    QTD INT,
+    Pot_W INT,
+    FP DECIMAL(5, 2)
 )";
 
-if ($conn->query($sql) === TRUE) {
+if ($conn->query($sql_create_table) === TRUE) {
     echo "Tabela de projetos criada com sucesso ou já existe.<br>";
     // Redireciona para a página "tabela"
     header("Location: tabela.php");
