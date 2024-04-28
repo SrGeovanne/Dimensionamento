@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Criar Projeto</title>
+    <link rel="stylesheet" href="gg.css">
 </head>
 <body>
     <h2>Criar Projeto</h2>

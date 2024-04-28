@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Tabela do Projeto</title>
+    <link rel="stylesheet" href="gg.css">
 </head>
 
 <body>
@@ -16,6 +17,7 @@
             <th>QTD</th>
             <th>Pot W</th>
             <th>FP</th>
+            <th>Ações</th>
         </tr>
         <tr>
             <!-- Campos para inserir dados -->
@@ -47,11 +49,13 @@
                 </select>
                 <input type="text" name="fp_valor[]" style="display:none;">
             </td>
+            <td><button onclick="removerLinha(this)">-</button></td>
         </tr>
     </table>
     <br>
     <button onclick="adicionarLinha()">+</button>
-    <button onclick="salvarDados()">Salvar e Calcular</button>
+    <button onclick="salvarDados()">Salvar</button>
+    <button onclick="calcular()">Calcular</button>
 
     <script>
         function atualizarOpcoes(selectElement) {
@@ -178,6 +182,15 @@
 
                 cell.appendChild(input);
             }
+
+            // Adicionar botão de remoção de linha
+            var cellRemoveButton = newRow.insertCell(cells.length);
+            var removeButton = document.createElement("button");
+            removeButton.textContent = "-";
+            removeButton.onclick = function() {
+                removerLinha(this);
+            };
+            cellRemoveButton.appendChild(removeButton);
         }
 
         function verificarFP(selectElement) {
@@ -193,45 +206,79 @@
             }
         }
 
+        function removerLinha(button) {
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
         function salvarDados() {
-    var formData = new FormData();
-    var tableRows = document.querySelectorAll('#tabela-projeto tr');
+            var formData = new FormData();
+            var tableRows = document.querySelectorAll('#tabela-projeto tr');
 
-    // Itera sobre as linhas da tabela, exceto a primeira que contém os cabeçalhos
-    for (var i = 1; i < tableRows.length; i++) {
-        var row = tableRows[i];
-        var rowData = {};
+            // Itera sobre as linhas da tabela, exceto a primeira que contém os cabeçalhos
+            for (var i = 1; i < tableRows.length; i++) {
+                var row = tableRows[i];
+                var rowData = {};
 
-        // Obtém os elementos de input e select da linha atual
-        var inputs = row.querySelectorAll('input, select');
+                // Obtém os elementos de input e select da linha atual
+                var inputs = row.querySelectorAll('input, select');
 
-        // Itera sobre os elementos para obter seus nomes e valores
-        inputs.forEach(function(input) {
-            rowData[input.name] = input.value;
-        });
+                // Itera sobre os elementos para obter seus nomes e valores
+                inputs.forEach(function(input) {
+                    rowData[input.name] = input.value;
+                });
 
-        // Adiciona os dados da linha ao formData
-        for (var key in rowData) {
-            formData.append(key, rowData[key]);
-        }
-    }
-
-    // Envia os dados para o arquivo PHP responsável por salvar no banco de dados
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                alert("Dados salvos e calculados!");
-            } else {
-                alert("Erro ao salvar os dados!");
+                // Adiciona os dados da linha ao formData
+                for (var key in rowData) {
+                    formData.append(key, rowData[key]);
+                }
             }
+
+            // Envia os dados para o arquivo PHP responsável por salvar no banco de dados
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        alert("Dados salvos!");
+                    } else {
+                        alert("Erro ao salvar os dados!");
+                    }
+                }
+            };
+
+            xhr.open("POST", "salvar_dados.php", true);
+            xhr.send(formData);
         }
-    };
 
-    xhr.open("POST", "salvar_dados.php", true);
-    xhr.send(formData);
-}
+        function calcular() {
+            var formData = new FormData();
+            var tableRows = document.querySelectorAll('#tabela-projeto tr');
 
+            // Itera sobre as linhas da tabela, exceto a primeira que contém os cabeçalhos
+            for (var i = 1; i < tableRows.length; i++) {
+                var row = tableRows[i];
+                var rowData = {};
+
+                // Obtém os elementos de input e select da linha atual
+                var inputs = row.querySelectorAll('input, select');
+
+                // Itera sobre os elementos para obter seus nomes e valores
+                inputs.forEach(function(input) {
+                    rowData[input.name] = input.value;
+                });
+
+                // Adiciona os dados da linha ao formData
+                for (var key in rowData) {
+                    formData.append(key, rowData[key]);
+                }
+            }
+
+            // Cria uma URL com os dados da tabela
+            var url = "saida.php?" + new URLSearchParams(formData).toString();
+
+            // Redireciona para a página de saída com os dados da tabela
+            window.location.href = url;
+        }
     </script>
 </body>
 
